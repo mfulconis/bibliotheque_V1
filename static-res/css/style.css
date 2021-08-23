@@ -1,0 +1,58 @@
+
+/* STYLE FOR DESKTOP */
+.Titre {
+   text-align:center;
+   margin-top:0.6em;
+   font-size:64px;
+}
+.Soustitre {
+   text-align:center;
+   margin-top:0.6em;
+   padding:0.3em;
+   background-color:darkgoldenrod;
+   color:white;
+   font-size:18px;
+   font-weight:500;
+
+}
+
+
+
+/* STYLE FOR TABLET */
+@media only screen and (min-width:381px) and (max-width: 770px) {
+.Titre {
+    font-size:36px;
+}
+
+.Soustitre {
+   text-align:center;
+   margin-top:0.6em;
+   padding:0.3em;
+   background-color:darkgoldenrod;
+   color:white;
+   font-size:14px;
+   font-weight:400;
+
+}
+}
+
+/* STYLE FOR SMARTPHONE */
+@media only screen and (max-width: 380px) {
+.Titre {
+    margin-top:0.8em;
+    font-size:24px;
+    font-weight:bolder;
+
+}
+
+.Soustitre {
+   text-align:center;
+   margin-top:0.6em;
+   padding:0.3em;
+   background-color:darkgoldenrod;
+   color:white;
+   font-size:14px;
+   font-weight:400;
+
+}
+}
