@@ -1,9 +1,11 @@
-
 /* STYLE FOR DESKTOP */
 .Titre {
-   text-align:center;
-   margin-top:0.6em;
+   text-align:left;
+   margin-top:0.4em;
+   margin-left:0.2em;
    font-size:64px;
+   color:#342628;
+   font-family:courrier;
 }
 .Soustitre {
    text-align:center;
@@ -16,7 +18,19 @@
 
 }
 
+h3 {
+color:#F7F4EF;
+}
 
+p.txtblanc {
+color:#F7F4EF;
+}
+
+row.sspadding {
+
+padding-right:0px;
+padding-left:0px;
+}
 
 /* STYLE FOR TABLET */
 @media only screen and (min-width:381px) and (max-width: 770px) {
