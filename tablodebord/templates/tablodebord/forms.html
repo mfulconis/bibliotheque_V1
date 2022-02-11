@@ -1,10 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
+{% extends 'index.html' %}
+{% block titre %}recherche{% endblock titre %}
+
+  {% block fenetre-HD %}
+
+<h2>Module de recherche</h2>
+  <p>Choisissez l'auteur recherché :</p>
+  <form action="" method="post">
+    {% csrf_token %}
+   <p class="soustitre" {{ form2.as_p }} </p>
+    <input type="submit" value="Chercher">
+       </form>
+<hr>
+  <p>Saisissez le mot clef recherché :</p>
+<form action="" method="post">
+    {% csrf_token %}
+   <p class="soustitre" {{ form.as_p }} </p>
+    <input type="submit" value="Chercher">
+       </form>
+
+
+ {% endblock fenetre-HD %}
+
+
+
+{% block principal %}
+ <!-- RESULTAT DE LA RECHERCHE PAR MOT CLEF--!>
+<div class="col-xs-12 col-md-12" style="padding:1.0em;padding-top:1.0em;">
+    <p> {{ Resultat }}</p>
+ {% for livre in Resultats %}
+<p> {{ livre.titre }} de {{ livre.auteur }} -<button type="button" class="btn"><a href="#" data-toggle="modal" data-target="#fichelivre">Voir la fiche</a></button></p>
+  <p> {{ livre.resume|linebreaks|safe|truncatewords:50 }}</p>
+  <p> {{ livre.tags }} </p>
+
+    <!-- POPUP FICHE LIVRE--!>
+        <div class="modal fade" id="fichelivre">
+            <div  class="modal-dialog">
+            <div  class="modal-content">
+                <div  class="modal-header">Fiche complète du livre
+                <button type="button" class="close" data-dismiss="modal">X</button>
+                    </div>
+               <p> {{ livre.titre }}</p>
+              <p> {{ livre.auteur }}</p>
+                 <p> {{ livre.resume }}</p>
+              <p> {{ livre.tags }}</p>
+                <p>Nombre de pages : {{ livre.pages }} et format : {{ livre.format }}</p>
+            </div>
+
+</div>
+        </div>
+  {% endfor %}
+     <!-- RESULTAT DE LA RECHERCHE PAR AUTEUR--!>
+     {% for livre in Resultats2 %}
+<p> {{ livre.titre }} de {{ livre.auteur }} -<button type="button" class="btn"><a href="#" data-toggle="modal" data-target="#fichelivre">Voir la fiche</a></button></p>
+  <p> {{ livre.resume|linebreaks|safe|truncatewords:50 }}</p>
+  <p> {{ livre.tags }} </p>
+
+       <!-- POPUP FICHE LIVRE--!>
+        <div class="modal fade" id="fichelivre">
+            <div  class="modal-dialog">
+            <div  class="modal-content">
+                <div  class="modal-header">Fiche complète du livre
+                <button type="button" class="close" data-dismiss="modal">X</button>
+                    </div>
+                <p> {{ livre.titre }}</p>
+              <p> {{ livre.auteur }}</p>
+                 <p> {{ livre.resume }}</p>
+              <p> {{ livre.tags }}</p>
+                <p>Nombre de pages : {{ livre.pages }} et format : {{ livre.format }}</p>
+            </div>
+
+</div>
+        </div>
+  {% endfor %}
+ {% endblock principal %}
+
+
+
 </body>
 </html>

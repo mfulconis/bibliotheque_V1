@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from tablodebord import loaddata
+from django.urls import reverse
+from tablodebord import loaddata, navigation
 from tablodebord.models import Auteur
 from tablodebord.models import Livre
 import requests
@@ -9,6 +10,12 @@ import json
 from tablodebord.FonctionsEtMethodes import SuprCar
 from tablodebord.FonctionsEtMethodes import verifier
 from tablodebord.FonctionsEtMethodes import SupprimerEnregistrement
+from tablodebord.forms import RechercheMot, RechercheAuteur
+from tablodebord.Testbis_word2vec import SearchBook
+from django.views import generic
+from django.db import models
+from tablodebord.navigation import navigation_items
+
 
 
 # La page principale
@@ -19,7 +26,8 @@ def index(request):
     tag = loaddata.tagcites()
     loaddata.LivresLus()
     template = loader.get_template('tablodebord/index.html')
-    context = {'nbedelivre' : nb, 'poche' : format[0], 'moyen' : format[1], 'grand' : format[2], 'auteur' : auteur, 'tagcite' : tag}
+    legende = "La bibliothèque compte " + str(nb) + " livres dont " + str(format[0]) + " livres de poche, " + str(format[1]) + " livres moyen format et " + str(format[2]) + " livres grand format."
+    context = {'legende' : legende, 'auteur' : auteur, 'tagcite' : tag}
     return HttpResponse(template.render(context, request))
 
 def Save_base_Livre(request):
@@ -27,7 +35,8 @@ def Save_base_Livre(request):
     r = requests.get('https://api.airtable.com/v0/appBvKk6a0YWsf0ay/'
                      'Biblioth%C3%A8que%20des%20Fulcos?api_key=keyAeXwxVMw0lLYtK&'
                      'fields%5B%5D=Titre&fields%5B%5D=Nomtxt&fields%5B%5D=Tagstxt&'
-                     'fields%5B%5D=Formatcm&fields%5B%5D=Pages&fields%5B%5D=Lutxt')
+                     'fields%5B%5D=Formatcm&fields%5B%5D=Pages&fields%5B%5D=Lutxt&'
+                     '&fields%5B%5D=reference&fields%5B%5D=Resume')
     base = json.loads(r.text)
     # Suppression des données existantes
     SupprimerEnregistrement()
@@ -46,6 +55,8 @@ def Save_base_Livre(request):
         element_tags = SuprCar(element_tags)
         element_pages = int(champb["Pages"])
         element_livrelu = str(champb["Lutxt"])
+        element_reference = str(champb["reference"])
+        element_resume = str(champb["Resume"])
         cur1 = verifier(element_auteur)
         if cur1 is None:
             nom_auteur = Auteur(nom=element_auteur)
@@ -53,12 +64,68 @@ def Save_base_Livre(request):
             cur2 = verifier(element_auteur)
             livre = Livre(titre=element_titre, auteur_id=cur2[0],
                           format=element_format, pages=element_pages,
-                          tags=element_tags, livrelu=element_livrelu)
+                          tags=element_tags, livrelu=element_livrelu,
+                          reference=element_reference, resume=element_resume)
             livre.save()
         else:
             cur3 = verifier(element_auteur)
             livre = Livre(titre = element_titre, auteur_id = cur3[0],
                       format = element_format, pages = element_pages,
-                      tags = element_tags, livrelu = element_livrelu)
+                      tags = element_tags, livrelu = element_livrelu,
+                      reference=element_reference, resume=element_resume)
             livre.save()
-    return HttpResponse("La base de données a été sauvegardée !")
+    auteur = loaddata.nblivreauteur()
+    tag = loaddata.tagcites()
+    loaddata.LivresLus()
+    template = loader.get_template('tablodebord/index.html')
+    legende = "Votre base de données a bien été sauvegardée !"
+    context = {'legende' : legende, 'auteur' : auteur, 'tagcite' : tag}
+    return HttpResponse(template.render(context, request))
+
+
+def resultats(request):
+    return HttpResponse('le mot chrecherché est ')
+
+def recherche(request):
+    form = RechercheMot()
+    form2 = RechercheAuteur()
+    if request.method == 'POST':
+        # TRAITEMENT DU FORMULAIRE PAR AUTEUR
+        form2 = RechercheAuteur(request.POST)
+        if form2.is_valid():
+            id = form2.cleaned_data['terme2']
+            r2 = []
+            try:
+                for liv2 in Livre.objects.filter(auteur_id=id):
+                    r2 = r2 + [liv2]
+                    print(liv2)
+                template = loader.get_template('tablodebord/forms.html')
+                context = {'Resultats2': r2, 'form': form, 'form2': form2}
+                return HttpResponse(template.render(context, request))
+            except:
+
+                #TRAITEMENT DU FORMULAIRE PAR MOT CLEF
+                form = RechercheMot(request.POST)
+                if form.is_valid():
+                    mot = form.cleaned_data['terme1']
+                    try:
+                        resultats = SearchBook(mot)
+                        re_list = []
+                        for item in resultats:
+                            for it in item:
+                                _, var, _ = it
+                                r = Livre.objects.get(reference=var)
+                                re_list = re_list + [r]
+                        template = loader.get_template('tablodebord/forms.html')
+                        context = {'Resultats' : re_list, 'form' : form, 'form2' : form2 }
+                        return HttpResponse(template.render(context, request))
+                    except:
+                        Resultat = 'Aucun ouvrage de correspond à votre recherche'
+                        template = loader.get_template('tablodebord/forms.html')
+                        context = {'Resultat': Resultat, 'form': form, 'form2': form2}
+                        return HttpResponse(template.render(context, request))
+
+    else:
+        form = RechercheMot()
+        form2 = RechercheAuteur()
+    return render(request, 'tablodebord/forms.html' , {'form' : form, 'form2' : form2})

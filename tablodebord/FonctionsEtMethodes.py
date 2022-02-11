@@ -17,6 +17,7 @@ def DateDuJour():
 def SuprCar(chaine):
     carspe = "'${[()]}"
     for c in carspe:
+        locals()
         chaine = chaine.replace(c,'')
     return chaine
 

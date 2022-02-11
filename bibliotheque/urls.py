@@ -19,7 +19,9 @@ from tablodebord import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', views.index),
+    path('index/', views.index, name='accueil'),
     path('', views.index),
-    path('save/', views.Save_base_Livre),
+    path('save/', views.Save_base_Livre, name='save'),
+    path('recherche/', views.recherche, name='recherche'),
+    #path('resultats/', views.resultats, name='resultats'),
 ]

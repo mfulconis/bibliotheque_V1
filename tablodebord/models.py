@@ -16,6 +16,8 @@ class Livre(models.Model):
     pages = models.IntegerField()
     tags = models.TextField(blank=True)
     livrelu = models.CharField(max_length=255, blank=True)
+    resume = models.TextField(blank=True)
+    reference = models.CharField(max_length=20, default='REFERENCE')
 
     def __str__(self):
-        return self.titre
+        return '{} {}'.format(self.titre, self.auteur)
