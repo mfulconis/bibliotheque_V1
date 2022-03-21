@@ -6,7 +6,8 @@
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Bibliothèque-{% block titre %}accueil{% endblock titre %}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+
 </head>
 <body>
 
@@ -14,13 +15,13 @@
 
     <div class="row">
         <div class="col-xs-12 col-md-6" style="background-color:#F7F4EF">
-        <div class="col-xs-12 col-md-6 Titre">Bienvenue <br>dans notre bibliothèque <br>virtuelle !</div>
+        <div class="col-xs-12 col-md-6 Titre">Bienvenue dans notre bibliothèque virtuelle&nbsp;!</div>
         </div>
 
 
-        <div class="col-xs-12 col-md-6" style="background-color:#FEAA00">
+        <div class="col-xs-12 col-md-6" style="padding:1.0em; background-color:#FEAA00;">
             {% block fenetre-HD %}
-            <h2>{{legende}}</h2>
+            <p class="Titre2">{{legende}}</p>
             {% endblock fenetre-HD %}
            </div>
     </div>

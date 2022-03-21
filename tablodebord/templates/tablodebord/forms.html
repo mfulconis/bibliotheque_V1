@@ -1,4 +1,4 @@
-{% extends 'index.html' %}
+{% extends 'tablodebord/index.html' %}
 {% block titre %}recherche{% endblock titre %}
 
   {% block fenetre-HD %}
@@ -6,7 +6,7 @@
 <h2>Module de recherche</h2>
   <p>Choisissez l'auteur recherché :</p>
   <form action="" method="post">
-    {% csrf_token %}
+     {% csrf_token %}
    <p class="soustitre" {{ form2.as_p }} </p>
     <input type="submit" value="Chercher">
        </form>
@@ -25,56 +25,67 @@
 
 {% block principal %}
  <!-- RESULTAT DE LA RECHERCHE PAR MOT CLEF--!>
-<div class="col-xs-12 col-md-12" style="padding:1.0em;padding-top:1.0em;">
+
+<div class="col-xs-12 col-md-6" style="padding:1.0em;padding-top:1.0em;">
     <p> {{ Resultat }}</p>
+
  {% for livre in Resultats %}
-<p> {{ livre.titre }} de {{ livre.auteur }} -<button type="button" class="btn"><a href="#" data-toggle="modal" data-target="#fichelivre">Voir la fiche</a></button></p>
-  <p> {{ livre.resume|linebreaks|safe|truncatewords:50 }}</p>
-  <p> {{ livre.tags }} </p>
+<p><span class="livre">{{ livre.titre }}</span> de {{ livre.auteur }} -<a href="#" data-toggle="modal" data-target="#{{ livre.id }}"><button type="button" class="btn-fiche">Voir la fiche</button></a></p>
+
+
+
+
+
+<p> {{ livre.resume|linebreaks|safe|truncatewords:50 }}</p>
+
+
 
     <!-- POPUP FICHE LIVRE--!>
-        <div class="modal fade" id="fichelivre">
+        <div class="modal fade" id="{{ livre.id }}">
             <div  class="modal-dialog">
             <div  class="modal-content">
-                <div  class="modal-header">Fiche complète du livre
+                <div  class="modal-header fiche">Fiche complète du livre
                 <button type="button" class="close" data-dismiss="modal">X</button>
                     </div>
-               <p> {{ livre.titre }}</p>
-              <p> {{ livre.auteur }}</p>
+                <div class="content-fiche"> <p> <span class="livre">{{ livre.titre }}</span></p>
+                    <p>de <span class="auteur">{{ livre.auteur }}</span></p>
                  <p> {{ livre.resume }}</p>
-              <p> {{ livre.tags }}</p>
+                    <p> <span class="tags">{{ livre.tags }}</span></p>
                 <p>Nombre de pages : {{ livre.pages }} et format : {{ livre.format }}</p>
-            </div>
+                </div>
 
+ </div>
 </div>
+
         </div>
-  {% endfor %}
+
+{% endfor %}
+
+
      <!-- RESULTAT DE LA RECHERCHE PAR AUTEUR--!>
-     {% for livre in Resultats2 %}
-<p> {{ livre.titre }} de {{ livre.auteur }} -<button type="button" class="btn"><a href="#" data-toggle="modal" data-target="#fichelivre">Voir la fiche</a></button></p>
+  {% for livre in Resultats2 %}
+<p> <span class="livre">{{ livre.titre }}</span> de {{ livre.auteur }} - <a href="#" data-toggle="modal" data-target="#{{ livre.id }}"><button type="button" class="btn-fiche">Voir la fiche</button></a></p>
   <p> {{ livre.resume|linebreaks|safe|truncatewords:50 }}</p>
-  <p> {{ livre.tags }} </p>
 
-       <!-- POPUP FICHE LIVRE--!>
-        <div class="modal fade" id="fichelivre">
-            <div  class="modal-dialog">
-            <div  class="modal-content">
-                <div  class="modal-header">Fiche complète du livre
-                <button type="button" class="close" data-dismiss="modal">X</button>
-                    </div>
-                <p> {{ livre.titre }}</p>
-              <p> {{ livre.auteur }}</p>
-                 <p> {{ livre.resume }}</p>
-              <p> {{ livre.tags }}</p>
-                <p>Nombre de pages : {{ livre.pages }} et format : {{ livre.format }}</p>
+
+    <!-- POPUP FICHE LIVRE--!>
+ <div class="modal fade" id="{{ livre.id }}">
+     <div  class="modal-dialog">
+     <div  class="modal-content">
+         <div  class="modal-header fiche">Fiche complète du livre
+         <button type="button" class="close" data-dismiss="modal">X</button>
+             </div>
+         <div class="content-fiche"> <p><span class="livre"> {{ livre.titre }}</span></p>
+             <p>de <span class="auteur">{{ livre.auteur }}</span></p>
+          <p> {{ livre.resume }}</p>
+             <p><span class="tags"> {{ livre.tags }}</span></p>
+             <p>Nombre de pages : {{ livre.pages }} et format : {{ livre.format }}</p></div>
+
+     </div>
+
             </div>
-
 </div>
-        </div>
   {% endfor %}
+</div>
+
  {% endblock principal %}
-
-
-
-</body>
-</html>

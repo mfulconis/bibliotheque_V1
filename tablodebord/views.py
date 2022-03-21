@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from tablodebord import loaddata, navigation
+from tablodebord import loaddata
 from tablodebord.models import Auteur
 from tablodebord.models import Livre
 import requests
@@ -14,7 +14,6 @@ from tablodebord.forms import RechercheMot, RechercheAuteur
 from tablodebord.Testbis_word2vec import SearchBook
 from django.views import generic
 from django.db import models
-from tablodebord.navigation import navigation_items
 
 
 
@@ -31,13 +30,23 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 def Save_base_Livre(request):
-    # recupération des données airtable #
-    r = requests.get('https://api.airtable.com/v0/appBvKk6a0YWsf0ay/'
-                     'Biblioth%C3%A8que%20des%20Fulcos?api_key=keyAeXwxVMw0lLYtK&'
-                     'fields%5B%5D=Titre&fields%5B%5D=Nomtxt&fields%5B%5D=Tagstxt&'
-                     'fields%5B%5D=Formatcm&fields%5B%5D=Pages&fields%5B%5D=Lutxt&'
-                     '&fields%5B%5D=reference&fields%5B%5D=Resume')
-    base = json.loads(r.text)
+    params = ()
+    airtable_records = []
+    run = True
+    while run is True:
+        r = requests.get('https://api.airtable.com/v0/appBvKk6a0YWsf0ay/'
+                         'Biblioth%C3%A8que%20des%20Fulcos?api_key=keyAeXwxVMw0lLYtK&'
+                         'fields%5B%5D=Titre&fields%5B%5D=Nomtxt&fields%5B%5D=Tagstxt&'
+                         'fields%5B%5D=Formatcm&fields%5B%5D=Pages&fields%5B%5D=Lutxt&'
+                         '&fields%5B%5D=reference&fields%5B%5D=Resume', params=params)
+        airtable_reponse = r.json()
+        airtable_records += (airtable_reponse['records'])
+        if 'offset' in airtable_reponse:
+            run = True
+            params = (('offset', airtable_reponse['offset']),)
+        else:
+            run = False
+    base = {'records': airtable_records}
     # Suppression des données existantes
     SupprimerEnregistrement()
     # Traitement des données et enregistrement des données#
@@ -98,7 +107,6 @@ def recherche(request):
             try:
                 for liv2 in Livre.objects.filter(auteur_id=id):
                     r2 = r2 + [liv2]
-                    print(liv2)
                 template = loader.get_template('tablodebord/forms.html')
                 context = {'Resultats2': r2, 'form': form, 'form2': form2}
                 return HttpResponse(template.render(context, request))
@@ -108,6 +116,7 @@ def recherche(request):
                 form = RechercheMot(request.POST)
                 if form.is_valid():
                     mot = form.cleaned_data['terme1']
+                    mot = mot.lower()
                     try:
                         resultats = SearchBook(mot)
                         re_list = []
@@ -119,8 +128,8 @@ def recherche(request):
                         template = loader.get_template('tablodebord/forms.html')
                         context = {'Resultats' : re_list, 'form' : form, 'form2' : form2 }
                         return HttpResponse(template.render(context, request))
-                    except:
-                        Resultat = 'Aucun ouvrage de correspond à votre recherche'
+                    except Exception as err:
+                        Resultat = err
                         template = loader.get_template('tablodebord/forms.html')
                         context = {'Resultat': Resultat, 'form': form, 'form2': form2}
                         return HttpResponse(template.render(context, request))
@@ -129,3 +138,4 @@ def recherche(request):
         form = RechercheMot()
         form2 = RechercheAuteur()
     return render(request, 'tablodebord/forms.html' , {'form' : form, 'form2' : form2})
+
