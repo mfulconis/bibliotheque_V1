@@ -64,7 +64,6 @@ def motAChercher(mot):
 
 
 def SearchBook(mot):
-
         temp1 = recupererDonnees()
         # définition des stopswords dans un fichier dictionnaire.txt
         stopwords = open('tablodebord/dictionnaire.txt', 'r')

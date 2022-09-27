@@ -42,14 +42,26 @@
                 <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'save' %}">MAJ la BdD</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="{% url 'recherche' %}">Recherche</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-toggle="modal" data-target="#fenetrestats">Statistiques</a>
             </li>
+
+            {% if request.user.is_authenticated == False %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'connexion:login' %}" >Connexion</a>
+            </li>
+             {% endif %}
+            {% if request.user.is_authenticated == True %}
+             <li class="nav-item">
+                <a class="nav-link" href="{% url 'save' %}">MAJ la BdD</a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link" href="{% url 'connexion:logout' %}" >Déconnexion</a>
+            </li>
+            {% endif %}
+
         </ul>
 
     </div>
@@ -97,14 +109,28 @@
                 <div  class="modal-header">Les statistiques
                 <button type="button" class="close" data-dismiss="modal">X</button>
                     </div>
+                <div class="modal-body">
                  <img src="{% static 'images/mongraphe2.png' %}">
+                </div>
             </div>
 
 </div>
         </div>
 
+<!-- POPUP CONNEXION-->
+    <div class="modal fade" id="fenetreconnexion">
+            <div  class="modal-dialog">
+            <div  class="modal-content">
+                <div  class="modal-header">Veuillez vous connecter :
+                <button type="button" class="close" data-dismiss="modal">X</button>
+                    </div>
+                <div class="modal-body">
 
+</div>
+            </div>
 
+</div>
+        </div>
 <!-- LIENS JQUERY-->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

@@ -5,9 +5,11 @@ from collections import Counter
 import os
 from django.conf import settings
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import re
 import spacy
 from spacy.lang.fr.stop_words import STOP_WORDS as stopwords
+import pandas as pd
 
 stopwords2 =["L'", "La", "Le", "Une", "Un", "le", "la", "A", "Les", "les", "Des", "des", "Ce", "ce", "Ces", "ces", "Ses", "ses", "si", "Si", " ", "_", "jusqu'"]
 
@@ -50,63 +52,6 @@ def creercorpus():
         json.dump(dictionnaire, file)
         file.close()
 
-def creerthesaurus():
-    nlp = spacy.load("fr_core_news_md")
-    creercorpus()
-    r = open("corpus.json")
-    dico = json.load(r)
-    motsclefs = {}
-    grilledef = {}
-    mots = ""
-
-    for element in dico:
-        ligne = dico[element]
-        tag = " ".join(ligne[1])
-        grille = nlp(ligne[0] + " " + tag + " " + ligne[2])
-        liste = []
-        for item in grille:
-            if item.pos_ == "NOUN" or "PROPN":
-                if item.text not in stopwords:
-                    if item.text not in stopwords2:
-                        mots = re.sub(r'[^\w]+', "", item.text)
-                        if mots and len(mots)>2:
-                            liste.append(mots.lower())
-        motsclefs = { str(element) : liste }
-        grilledef = grilledef | motsclefs
-    dictionnaire1 ={}
-    for element in grilledef:
-        laliste =  grilledef[element]
-        dico1 = {}
-        for item in laliste:
-            nb = laliste.count(item)
-            if nb > 1:
-                dico1[item] = nb
-        dictionnaire1[element] = dico1
-    #for element in dictionnaire1:
-       # print(element + " " + str(dictionnaire1[element]))
-    file = open("thesaurus.json", "w")
-    json.dump(dictionnaire1, file)
-    file.close()
-
-
-#creerthesaurus()
-
-ref = "Cthulhu"
-def choixdicoref(ref):
-    creerthesaurus()
-    with open("thesaurus.json") as json_data:
-        dico = json.load(json_data)
-        for y in dico.keys():
-            w = dico[y]
-            if ref.lower() in w:
-                print(y + " : " + str(dico[y]))
-        #for element in dico:
-            #print(element)
-    #file.close()
-    #if ref in dico.keys:
-        #print(dico.keys)
-
-#choixdicoref(ref)
 
 # calcul du nombre de livres #
 def nbedelivre():
@@ -192,31 +137,29 @@ def tagcites():
 ### Creation du graphique des livres lu par qui
 # livres lu et par qui ###
 
+
 def LivresLus():
-    nb = nbedelivre()
     base = getdata()
-    temp = base["records"]
-    tablo5 = []
-    p = 0
-    for element in temp:
-        champa = temp[p]
-        champb = champa["fields"]
-        champc = champb["Lutxt"]
-        tablo5.append(champc)
-        p= p + 1
-    comptelu = Counter(tablo5)
-    tablo6 = {}
-    camlist = []
-    for lu in comptelu:
-        tablo6.update({lu: comptelu[lu]})
-        pourcentage = (100*comptelu[lu]/nb)
-        pourcentage = round(pourcentage, 2)
-        camlist.append(pourcentage)
-    fig2 = Figure(figsize=(3, 2.3), dpi=100, facecolor='#ffffff')
-    fig2.suptitle("Les livres lus par...")
-    x = [tablo6['Lu par Marc'], tablo6['Lu par Annie'], tablo6['Utilise'], tablo6['Non lu']]
-    plot1 = fig2.add_subplot(111)
-    plot1.pie(x, labels=['Marc', 'Annie', 'Non lus', 'Feuilletés'], normalize=True)
-    fig2.savefig(os.path.join(settings.BASE_DIR, 'static-res/images/mongraphe2.png'))
+    nb = nbedelivre()
+    listedonnee = []
+    i = 0
+    while i < nb:
+        listedonnee.append(base["records"][i]["fields"]["Lutxt"])
+        i= i+1
+    data_dict = dict(Counter(listedonnee))
+    livreslus = pd.DataFrame(list(data_dict.items()), columns=['Lu', 'Quantité'])
+    plt.style.use('ggplot')
+    fig = plt.Figure(figsize=(4, 3))
+    ax = fig.add_subplot(111)
+    ax.set_title("Par qui sont lus les livres ?", color="#555555", fontname="Futura", fontsize="20", fontweight="bold")
+    ax.pie(livreslus.Quantité, labels = ['Annie', 'Marc', 'Non lus', ' ', 'Les deux'],
+           textprops={'fontsize': 16, 'fontname': 'Times'},
+               colors = ['red', 'green', 'yellow', 'grey', 'orange'],
+               explode = [0, 0, 0, 0, 0],
+               #autopct = lambda x: str(round(x, 2)) + '%',
+               pctdistance = 0.7, labeldistance = 1.15,
+               shadow = True)
+    fig.savefig(os.path.join(settings.BASE_DIR, 'static-res/images/mongraphe2.png'))
     return
 
+###  FIN DE SCRIPT OU JE TESTE DU CODE ##

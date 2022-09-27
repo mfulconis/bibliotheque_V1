@@ -14,3 +14,4 @@ class RechercheAuteur(forms.Form):
         variable.append((id, auteur))
     LISTE_AUTEURS = variable
     terme2 = forms.ChoiceField(label='', choices=LISTE_AUTEURS, required=False)
+

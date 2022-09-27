@@ -1,0 +1,17 @@
+{% extends 'tablodebord/index.html' %}
+{% block titre %}Connexion{% endblock titre %}
+
+{% block fenetre-HD %}
+            <p class="Titre2">Les utilisateurs connectés ont accès à des fonctions supplémentaires.</p>
+{% endblock fenetre-HD %}
+
+{% block principal %}
+<div align="center">
+             <p class="Titre2">Veuillez vous connecter :</p>
+           <form method="POST">
+               {% csrf_token %}
+               {{ form.as_p }}
+               <input type="submit" value="Connexion">
+           </form>
+</div>
+{% endblock principal %}

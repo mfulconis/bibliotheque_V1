@@ -37,7 +37,6 @@ def verifier(var):
     cur = cur.fetchone()
     conn.commit()
     conn.close()
-    print(cur)
     return cur
 
 # Supprimer les enregistrement de la base de données

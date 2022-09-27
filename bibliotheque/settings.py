@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tablodebord.apps.TablodebordConfig',
+    'Comptes.apps.ComptesConfig'
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Authentification
+
+LOGIN_REDIRECT_URL = 'accueil'
+
 
 
 from bibliotheque.local_settings import  *
